@@ -4,3 +4,5 @@ chromadb
 streamlit
 python-dotenv
 sqlvalidator
+leafpay.db
+[leafpay.db]

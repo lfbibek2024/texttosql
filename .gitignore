@@ -1,2 +1,4 @@
 .env
 venv/*
+leafpay.db
+[leafpay.db]
