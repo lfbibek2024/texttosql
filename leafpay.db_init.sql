@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TEXT
 );
 
-CREATE TABLE IF NOT EXISTS "transaction" (
+CREATE TABLE IF NOT EXISTS "transactions" (
     id INTEGER PRIMARY KEY,
     user_id INTEGER,
     amount REAL,
@@ -33,7 +33,7 @@ INSERT INTO users (id, name, email, created_at) VALUES
     (1, 'Alice', 'alice@example.com', '2025-01-01'),
     (2, 'Bob', 'bob@example.com', '2025-01-02'),
     (3, 'Charlie', 'charlie@example.com', '2025-01-03');
-INSERT INTO "transaction" (id, user_id, amount, type, created_at) VALUES
+INSERT INTO "transactions" (id, user_id, amount, type, created_at) VALUES
     (1, 1, 100.0, 'credit', '2025-01-10'),
     (2, 1, 50.0, 'debit', '2025-01-11'),
     (3, 2, 200.0, 'credit', '2025-01-12');

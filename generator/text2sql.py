@@ -10,7 +10,13 @@ load_dotenv()
 def generate_sql(nl_query, schema_context):
     api_key = os.getenv("OPENAI_API_KEY")
     prompt = f"""
-You are an expert SQL generator. Given the following database schema and a user's question, write a syntactically correct SQL query for a PostgreSQL database. Only return the SQL query, nothing else.
+You are an expert SQL generator. Given the following database schema and a user's question, write a syntactically correct SQL query for a PostgreSQL database.
+
+Requirements:
+- Only select and display columns that are directly relevant to the user's question. Do not use SELECT *.
+- Do not include unnecessary columns or unrelated details in the result.
+- Add WHERE clauses or JOINs as needed to filter and focus the result.
+- Return only the SQL query, and nothing else (no explanations, no comments).
 
 Schema:
 {schema_context}

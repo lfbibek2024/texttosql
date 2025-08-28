@@ -35,32 +35,32 @@ def main():
     # Schema, sample queries, and example rows for each table
     docs = [
         # Schema (match actual SQLite schema)
-        "Table: user (id INTEGER PRIMARY KEY, name TEXT, email TEXT, created_at TEXT)",
-        "Table: transaction (id INTEGER PRIMARY KEY, user_id INTEGER, amount REAL, type TEXT, created_at TEXT)",
+        "Table: users (id INTEGER PRIMARY KEY, name TEXT, email TEXT, created_at TEXT)",
+        "Table: transactions (id INTEGER PRIMARY KEY, user_id INTEGER, amount REAL, type TEXT, created_at TEXT)",
         "Table: production (id INTEGER PRIMARY KEY, user_id INTEGER, product_name TEXT, quantity INTEGER, produced_at TEXT)",
         "Table: balance (user_id INTEGER PRIMARY KEY, balance REAL, last_updated TEXT)",
         # Example rows
-        "user: (1, 'Alice', 'alice@example.com', '2025-01-01')",
-        "user: (2, 'Bob', 'bob@example.com', '2025-01-02')",
-        "user: (3, 'Charlie', 'charlie@example.com', '2025-01-03')",
-        "transaction: (1, 1, 100.0, 'credit', '2025-01-10')",
-        "transaction: (2, 1, 50.0, 'debit', '2025-01-11')",
-        "transaction: (3, 2, 200.0, 'credit', '2025-01-12')",
+        "users: (1, 'Alice', 'alice@example.com', '2025-01-01')",
+        "users: (2, 'Bob', 'bob@example.com', '2025-01-02')",
+        "users: (3, 'Charlie', 'charlie@example.com', '2025-01-03')",
+        "transactions: (1, 1, 100.0, 'credit', '2025-01-10')",
+        "transactions: (2, 1, 50.0, 'debit', '2025-01-11')",
+        "transactions: (3, 2, 200.0, 'credit', '2025-01-12')",
         "production: (1, 1, 'Widget', 10, '2025-01-15')",
         "production: (2, 2, 'Gadget', 5, '2025-01-16')",
         "balance: (1, 50.0, '2025-01-20')",
         "balance: (2, 200.0, '2025-01-20')",
         "balance: (3, 0.0, '2025-01-20')",
-        # Example queries (match actual table names)
+        # Example queries (match actual table names and columns)
         "SELECT * FROM users;",
         "SELECT * FROM users WHERE id = 1;",
-        "SELECT SUM(amount) FROM transaction WHERE user_id = 1;",
+        "SELECT SUM(amount) FROM transactions WHERE user_id = 1;",
         "SELECT * FROM production WHERE product_name = 'Widget';",
         "SELECT balance FROM balance WHERE user_id = 1;",
         "SELECT u.name, b.balance FROM users u JOIN balance b ON u.id = b.user_id;",
-        "SELECT t.* FROM transaction t JOIN users u ON t.user_id = u.id WHERE u.name = 'Alice';",
+        "SELECT t.id, t.amount, t.created_at, u.id, u.name, u.email FROM transactions t JOIN users u ON t.user_id = u.id WHERE u.name = 'Alice';",
         "SELECT COUNT(*) FROM production WHERE produced_at >= '2025-01-01';",
-        "SELECT * FROM transaction WHERE type = 'credit' AND amount > 1000;"
+        "SELECT * FROM transactions WHERE type = 'credit' AND amount > 1000;"
     ]
     metadatas = [{"type": "schema_or_example"}] * len(docs)
     ids = [f"doc_{i}" for i in range(len(docs))]

@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 import os
 import sys
 import sqlite3
@@ -21,7 +22,20 @@ def get_sql_result(nl_query, db_id):
         cursor = conn.cursor()
         cursor.execute(sql_query)
         if sql_query.strip().lower().startswith("select"):
-            columns = [desc[0] for desc in cursor.description]
+            # Use table name or alias from cursor.description if available
+            columns = []
+            seen = {}
+            for desc in cursor.description:
+                col = desc[0]
+                # Try to get table name from desc if available (sqlite3 does not provide by default)
+                # So, fallback to prefixing with col count
+                if col in seen:
+                    prefix = f"{seen[col]}_"
+                    columns.append(f"{prefix}{col}")
+                    seen[col] += 1
+                else:
+                    columns.append(col)
+                    seen[col] = 1
             rows = cursor.fetchall()
             conn.close()
             return sql_query, columns, rows, None
@@ -52,11 +66,16 @@ if st.button("Get Result"):
         st.code(sql_query, language="sql")
         if error:
             st.error(error)
+        
         elif columns and rows is not None:
             st.markdown("**Result:**")
-            st.dataframe({col: [row[i] for row in rows] for i, col in enumerate(columns)})
+            if len(rows) == 0:
+                st.info("No results found.")
+            else:
+                
+                df = pd.DataFrame(rows, columns=columns)
+                st.dataframe(df)
         else:
             st.success("Query executed successfully.")
     else:
         st.warning("Please enter a question before clicking 'Get Result'.")
-        st.warning("Please enter a question.")
