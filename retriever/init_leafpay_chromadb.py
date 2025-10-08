@@ -5,41 +5,34 @@ import os
 from dotenv import load_dotenv
 
 def main():
-    load_dotenv()
-    client = chromadb.Client(Settings())
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-    openai_ef = None
-    if openai_api_key:
-        try:
-            openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-                api_key=openai_api_key,
-                model_name="text-embedding-ada-002"
-            )
-        except Exception:
-            openai_ef = None
-    # If no API key, fallback to no embedding function (pure text search)
-    # Delete existing collection if it exists
-    try:
-        client.delete_collection("leafpay")
-        print("Deleted existing 'leafpay' collection in ChromaDB.")
-    except Exception:
-        pass
-    if openai_ef:
-        collection = client.get_or_create_collection(
-            name="leafpay",
-            embedding_function=openai_ef
-        )
-    else:
-        collection = client.get_or_create_collection(name="leafpay")
-
-    # Schema, sample queries, and example rows for each table
     docs = [
-        # Schema (match actual SQLite schema)
+        # --- Schema ---
         "Table: users (id INTEGER PRIMARY KEY, name TEXT, email TEXT, created_at TEXT)",
+        "users.id: Unique user identifier (INTEGER PRIMARY KEY)",
+        "users.     : User's full name (TEXT)",
+        "users.email: User's email address (TEXT)",
+        "users.created_at: Account creation date (TEXT)",
         "Table: transactions (id INTEGER PRIMARY KEY, user_id INTEGER, amount REAL, type TEXT, created_at TEXT)",
+        "transactions.id: Unique transaction identifier (INTEGER PRIMARY KEY)",
+        "transactions.user_id: User who made the transaction (INTEGER, FK to users.id)",
+        "transactions.amount: Transaction amount (REAL)",
+        "transactions.type: Transaction type (TEXT: credit/debit)",
+        "transactions.created_at: Transaction date (TEXT)",
         "Table: production (id INTEGER PRIMARY KEY, user_id INTEGER, product_name TEXT, quantity INTEGER, produced_at TEXT)",
+        "production.id: Unique production identifier (INTEGER PRIMARY KEY)",
+        "production.user_id: User who produced (INTEGER, FK to users.id)",
+        "production.product_name: Name of product (TEXT)",
+        "production.quantity: Quantity produced (INTEGER)",
+        "production.produced_at: Production date (TEXT)",
         "Table: balance (user_id INTEGER PRIMARY KEY, balance REAL, last_updated TEXT)",
-        # Example rows
+        "balance.user_id: User identifier (INTEGER PRIMARY KEY, FK to users.id)",
+        "balance.balance: Current balance (REAL)",
+        "balance.last_updated: Last update date (TEXT)",
+        # --- Relationships ---
+        "transactions.user_id references users.id",
+        "production.user_id references users.id",
+        "balance.user_id references users.id",
+        # --- Example rows ---
         "users: (1, 'Alice', 'alice@example.com', '2025-01-01')",
         "users: (2, 'Bob', 'bob@example.com', '2025-01-02')",
         "users: (3, 'Charlie', 'charlie@example.com', '2025-01-03')",
@@ -51,7 +44,7 @@ def main():
         "balance: (1, 50.0, '2025-01-20')",
         "balance: (2, 200.0, '2025-01-20')",
         "balance: (3, 0.0, '2025-01-20')",
-        # Example queries (match actual table names and columns)
+        # --- Example queries ---
         "SELECT * FROM users;",
         "SELECT * FROM users WHERE id = 1;",
         "SELECT SUM(amount) FROM transactions WHERE user_id = 1;",
@@ -62,6 +55,11 @@ def main():
         "SELECT COUNT(*) FROM production WHERE produced_at >= '2025-01-01';",
         "SELECT * FROM transactions WHERE type = 'credit' AND amount > 1000;"
     ]
+    # Initialize ChromaDB client and collection
+    client = chromadb.Client(Settings(
+        persist_directory="./chromadb_data"
+    ))
+    collection = client.get_or_create_collection("leafpay")
     metadatas = [{"type": "schema_or_example"}] * len(docs)
     ids = [f"doc_{i}" for i in range(len(docs))]
     collection.add(documents=docs, metadatas=metadatas, ids=ids)

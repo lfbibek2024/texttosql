@@ -15,7 +15,10 @@ This project enables users to interact with databases using natural language, co
 ## Setup
 1. Copy `.env.example` to `.env` and fill in your API keys.
 2. Install dependencies: `pip install -r requirements.txt`
-3. Run the app: `streamlit run frontend/app.py`
+3. python3 retriever/init_leafpay_chromadb.py
+4. Install sqllite
+5. Run the app: `streamlit run frontend/app.py`
+
 
 ## Structure
 - `app/` - Orchestration logic

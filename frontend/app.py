@@ -47,12 +47,30 @@ def get_sql_result(nl_query, db_id):
         return sql_query, None, None, f"SQL execution error: {e}"
 
 # --- Streamlit Frontend ---
+
 st.markdown("""
 <h1 style='color:#4F8BF9;'>Generative AI Text-to-SQL System</h1>
 <p style='font-size:1.1em;'>Ask questions about your <b>leafpay</b> database using natural language.<br>
 <b>Example:</b> <i>list all existing users</i>, <i>show all transactions for Alice</i>, <i>total balance for Bob</i></p>
 <hr>
 """, unsafe_allow_html=True)
+
+# --- DB Description Button ---
+if st.button("Show Database Description"):
+    st.info("""
+**LeafPay Database Overview:**
+
+In LeafPay, every user has an account with a balance. Users can make transactions (credits and debits) that affect their balance. Each transaction is linked to a user and records the amount, type, and date. Users can also produce items, which are tracked in the production table. The balance table keeps track of each user's current balance and when it was last updated.
+
+- **Users**: People who use LeafPay. Each user has a name, email, and account creation date.
+- **Transactions**: Money movements (credit or debit) made by users. Each transaction records the user, amount, type, and date.
+- **Production**: Items produced by users, including product name, quantity, and date.
+- **Balance**: The current balance for each user, updated after transactions.
+
+**Key Relationships:**
+- Every transaction and production is linked to a user.
+- The balance table shows the latest balance for each user.
+""")
 
 nl_query = st.text_input("Enter your question:", placeholder="e.g. list all existing users")
 db_id = "leafpay"  # Only one database used
